@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Hole-punch Display</string>
+    <string name="accessibility_service_description">Creates the hole-puch display.</string>
+    <string name="accessibility_service_label">Hole-punch Display</string>
+</resources>
