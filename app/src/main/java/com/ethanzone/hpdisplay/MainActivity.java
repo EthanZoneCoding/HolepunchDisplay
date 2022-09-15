@@ -29,51 +29,55 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Get preferences
+        SharedPreferences prefs = getSharedPreferences("com.ethanzone.hpdisplay", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
 
-        // Toggle
-        Switch toggle = findViewById(R.id.toggle);
 
-        SharedPreferences settings = getSharedPreferences("settings", 0);
-        boolean active = settings.getBoolean("active", false);
+        // Update switches
+        Switch active = findViewById(R.id.toggle);
+        active.setChecked(prefs.getBoolean("active", false));
+        Switch deletefrombar = findViewById(R.id.deletefrombar);
+        deletefrombar.setChecked(prefs.getBoolean("deletefrombar", false));
 
-        toggle.setChecked(active);
+        // Set listeners
+        deletefrombar.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            editor.putBoolean("deletefrombar", isChecked);
+            editor.apply();
+        });
 
-        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        active.setOnCheckedChangeListener((compoundButton, b) -> {
 
-                SharedPreferences settings = getSharedPreferences("settings", 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("active", b);
-                editor.apply();
+            editor.putBoolean("active", b);
+            editor.apply();
 
-                if(b & !MainActivity.this.isNotificationServiceEnabled(MainActivity.this)) {
+            if (b & !MainActivity.this.isNotificationServiceEnabled(MainActivity.this)) {
 
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setTitle("We need permission...")
-                            .setMessage("To want permission to read notifications, so we can show them in the display. On the next screen, find this app, and allow the permission.")
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("We need permission...")
+                        .setMessage("To want permission to read notifications, so we can show them in the display. On the next screen, find this app, and allow the permission.")
 
-                            .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+                        .setPositiveButton("Continue", (dialog, which) -> {
 
-                                    Intent intent=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-                                    startActivity(intent);
-                                }
-                            })
+                            Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+                            startActivity(intent);
+                        })
 
-                            // A null listener allows the button to dismiss the dialog and take no further action.
-                            .setNegativeButton("Back", null)
-                            .show();
-
-                }
+                        // A null listener allows the button to dismiss the dialog and take no further action.
+                        .setNegativeButton("Back", null)
+                        .show();
 
             }
+
         });
 
 
     }
 
-    private boolean isNotificationServiceEnabled(Context c){
+
+    // Check if we have notification access
+
+    private boolean isNotificationServiceEnabled(Context c) {
         String pkgName = c.getPackageName();
         final String flat = Settings.Secure.getString(c.getContentResolver(),
                 "enabled_notification_listeners");

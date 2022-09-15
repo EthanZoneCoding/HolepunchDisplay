@@ -8,12 +8,25 @@
 
     <Switch
         android:id="@+id/toggle"
-        android:layout_width="253dp"
+        android:layout_width="300dp"
         android:layout_height="67dp"
         android:checked="false"
         android:text="Enable Display"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.059" />
+
+    <Switch
+        android:id="@+id/deletefrombar"
+        android:layout_width="300dp"
+        android:layout_height="67dp"
+        android:checked="false"
+        android:text="Don't show notifications in default bar."
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toggle"
+        app:layout_constraintVertical_bias="0.233" />
 </androidx.constraintlayout.widget.ConstraintLayout>

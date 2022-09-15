@@ -37,6 +37,20 @@
         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     <Button
+        android:id="@+id/icon2"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/ic_edges_white"
+        android:clickable="false"
+        app:cornerRadius="1000dp"
+        app:layout_constraintBottom_toBottomOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="@+id/button"
+        app:layout_constraintHorizontal_bias="0.91"
+        app:layout_constraintStart_toStartOf="@+id/button"
+        app:layout_constraintTop_toTopOf="@+id/button"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+    <Button
         android:id="@+id/label"
         android:layout_width="74dp"
         android:layout_height="25dp"
