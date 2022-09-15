@@ -5,16 +5,21 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,6 +32,7 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 
 import java.util.Objects;
+import java.util.concurrent.Executor;
 
 public class HPDisplay extends AccessibilityService {
 
@@ -37,8 +43,11 @@ public class HPDisplay extends AccessibilityService {
     private Drawable miniIcon = null;
     private Drawable miniIcon2 = null;
     private String title = "Nothing to display";
+    private String titleBackup = "Nothing to display";
     private String description = "Check back later";
+    private String descriptionBackup = "Check back later";
     private WindowManager windowManager;
+    private AudioManager audioManager = null;
 
     // For gesture detections
     private float prevX, prevY;
@@ -109,16 +118,23 @@ public class HPDisplay extends AccessibilityService {
         this.pill.findViewById(R.id.label).setVisibility(View.GONE); // Don't show pill text
         this.pill.findViewById(R.id.description).setVisibility(View.GONE);
         this.display.setVisibility(View.GONE);
-        this.display.findViewById(R.id.button).setClickable(false); // Don't allow display to be clicked, only pill
+        this.display.findViewById(R.id.button).setClickable(false); // Don't allow display to be clicked, only pill (for now)
+        this.pill.findViewById(R.id.icon).setClickable(true); // Only allow icon to be clicked only on display
         this.display.findViewById(R.id.icon2).setVisibility(View.GONE); // Don't show display right icon
 
 
         // Initialize the icons
         this.icon = getDrawable(R.drawable.checkmark);
+        this.iconBackup = getDrawable(R.drawable.checkmark);
         this.miniIcon = getDrawable(R.drawable.ic_edges);
         this.miniIcon2 = getDrawable(R.drawable.ic_edges);
         this.pill.findViewById(R.id.icon).setBackground(this.miniIcon);
         this.pill.findViewById(R.id.icon2).setBackground(this.miniIcon2);
+
+        // Check for playing media
+        // Set up audio manager
+        this.audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        checkMediaWithManage();
 
         // First time animation
 
@@ -148,9 +164,10 @@ public class HPDisplay extends AccessibilityService {
             return true;
         });
 
-        // Close display on display swipe up
+        // Manage display touches and gestures
         this.display.setOnTouchListener((view, event) -> {
             Log.v("event", event.getAction() + "");
+
             float x = event.getX();
             float y = event.getY();
 
@@ -158,6 +175,7 @@ public class HPDisplay extends AccessibilityService {
                 case MotionEvent.ACTION_DOWN:
                     HPDisplay.this.isDown = true;
                     break;
+
                 case MotionEvent.ACTION_MOVE:
 
                     float dx = x - HPDisplay.this.prevX;
@@ -168,6 +186,7 @@ public class HPDisplay extends AccessibilityService {
                     }
 
                 case MotionEvent.ACTION_UP:
+
                     HPDisplay.this.isDown = false;
                     break;
             }
@@ -177,6 +196,13 @@ public class HPDisplay extends AccessibilityService {
             return true;
         });
 
+        this.display.findViewById(R.id.icon).setOnClickListener((view) -> {
+            Log.v("event", "Icon click!");
+            // Toggle media music
+            this.audioManager.dispatchMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+            this.audioManager.dispatchMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+
+        });
 
     }
 
@@ -194,7 +220,6 @@ public class HPDisplay extends AccessibilityService {
 
             // Fill in data
             this.pill.findViewById(R.id.icon).setBackground(this.miniIcon);
-            this.pill.findViewById(R.id.icon2).setBackground(this.miniIcon2);
             this.display.findViewById(R.id.icon).setBackground(this.icon);
             ((TextView) this.display.findViewById(R.id.label)).setText(this.title);
             ((TextView) this.display.findViewById(R.id.description)).setText(this.description);
@@ -272,36 +297,97 @@ public class HPDisplay extends AccessibilityService {
                 // Hide the Display
                 HPDisplay.this.display.setVisibility(View.GONE);
 
-
                 HPDisplay.this.contracting = false;
                 HPDisplay.this.open = false;
             }, 800);
         }
     }
 
-    public void setMediaManager(boolean on){
-        if (on) {
-            AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
 
-            // Backup the icon
+            String artist = intent.getStringExtra("artist");
+            String album = intent.getStringExtra("album");
+            String track = intent.getStringExtra("track");
+
+            // Fill in data
+            HPDisplay.this.title = track;
+            HPDisplay.this.description = artist + " - " + album;
+
+            ((TextView) HPDisplay.this.display.findViewById(R.id.label)).setText(HPDisplay.this.title);
+            ((TextView) HPDisplay.this.display.findViewById(R.id.description)).setText(HPDisplay.this.description);
+
+        }
+    };
+
+    public void checkMediaWithManage() {
+
+        // Check if media is playing
+        IntentFilter iF = new IntentFilter();
+        iF.addAction("com.android.music.metachanged");
+        iF.addAction("com.android.music.playstatechanged");
+        iF.addAction("com.android.music.playbackcomplete");
+        iF.addAction("com.android.music.queuechanged");
+        iF.addAction("com.htc.music.metachanged");
+        iF.addAction("fm.last.android.metachanged");
+        iF.addAction("com.sec.android.app.music.metachanged");
+        iF.addAction("com.nullsoft.winamp.metachanged");
+        iF.addAction("com.amazon.mp3.metachanged");
+        iF.addAction("com.miui.player.metachanged");
+        iF.addAction("com.real.IMP.metachanged");
+        iF.addAction("com.sonyericsson.music.metachanged");
+        iF.addAction("com.rdio.android.metachanged");
+        iF.addAction("com.samsung.sec.android.MusicPlayer.metachanged");
+        iF.addAction("com.andrew.apollo.metachanged");
+
+        if (this.audioManager.isMusicActive()) {
+            // Backup the data
             this.iconBackup = this.icon;
+            this.titleBackup = this.title;
+            this.descriptionBackup = this.description;
 
             // Set the icon to a play button, and show the right mini icon
             this.icon = getDrawable(R.drawable.pause);
             this.miniIcon2 = getDrawable(R.drawable.music);
 
 
+            // Register the receiver
+            registerReceiver(receiver, iF);
+
         } else {
-            // Restore the icon and hide the right icon
+            // Restore the data
             this.icon = this.iconBackup;
+            this.title = this.titleBackup;
+            this.description = this.descriptionBackup;
+
+
+            // Hide the right mini icon
             this.miniIcon2 = getDrawable(R.drawable.ic_edges);
+
+            // Unregister the receiver
+            try {
+                unregisterReceiver(receiver);
+            } catch (IllegalArgumentException e) {
+                // Do nothing
+            }
         }
+
+        this.pill.findViewById(R.id.icon2).setBackground(this.miniIcon2);
+        this.display.findViewById(R.id.icon).setBackground(this.icon);
+        ((TextView) this.display.findViewById(R.id.label)).setText(this.title);
+        ((TextView) this.display.findViewById(R.id.description)).setText(this.description);
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
         Log.v("event", event.toString());
+
+        // Check for media
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            HPDisplay.this.checkMediaWithManage();
+        }
 
         // Handle incoming notifications
         if (event.getEventType() == (AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED)) {
@@ -311,40 +397,26 @@ public class HPDisplay extends AccessibilityService {
             this.title = notification.extras.getString("android.title");
             this.description = notification.extras.getString("android.text");
 
-            // Check if media is playing
-            if (Objects.equals(notification.getChannelId(), "7")){
 
-                // If so, show the display as a media manager
-                Log.v("event", "Media playing!");
-                this.setMediaManager(true);
-
-            }
-
-            // Non media notification
-            else {
-                this.setMediaManager(false);
-
-                // Delete the notification from the bar if the setting is enabled
-                if (getSetting("deletefrombar")) {
-                    try {
-                        notification.deleteIntent.send();
-                    } catch (PendingIntent.CanceledException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // Try to get the icon
+            // Delete the notification from the bar if the setting is enabled
+            if (getSetting("deletefrombar") & !Objects.equals(notification.getChannelId(), "7")) {
                 try {
-                    this.icon = getPackageManager().getApplicationIcon((String) event.getPackageName());
-
-                    // Update the mini icon, because it is a new notification
-                    this.miniIcon = getPackageManager().getApplicationIcon((String) event.getPackageName());
-
-                } catch (PackageManager.NameNotFoundException e) {
+                    notification.deleteIntent.send();
+                } catch (PendingIntent.CanceledException e) {
                     e.printStackTrace();
                 }
             }
 
+            // Try to get the icon
+            try {
+                this.icon = getPackageManager().getApplicationIcon((String) event.getPackageName());
+
+                // Update the mini icon, because it is a new notification
+                this.miniIcon = getPackageManager().getApplicationIcon((String) event.getPackageName());
+
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
 
 
             expand();

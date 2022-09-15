@@ -27,7 +27,6 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:background="@drawable/ic_edges_white"
-        android:clickable="false"
         app:cornerRadius="1000dp"
         app:layout_constraintBottom_toBottomOf="@+id/button"
         app:layout_constraintEnd_toEndOf="@+id/button"
