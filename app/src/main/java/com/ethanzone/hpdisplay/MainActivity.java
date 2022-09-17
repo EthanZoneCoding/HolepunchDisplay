@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -35,8 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Update switches
-        Switch active = findViewById(R.id.toggle);
-        active.setChecked(prefs.getBoolean("active", false));
+        Button active = findViewById(R.id.toggle);;
         Switch deletefrombar = findViewById(R.id.deletefrombar);
         deletefrombar.setChecked(prefs.getBoolean("deletefrombar", false));
 
@@ -46,12 +46,9 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         });
 
-        active.setOnCheckedChangeListener((compoundButton, b) -> {
+        active.setOnClickListener((compoundButton) -> {
 
-            editor.putBoolean("active", b);
-            editor.apply();
-
-            if (b & !MainActivity.this.isNotificationServiceEnabled(MainActivity.this)) {
+            if (!MainActivity.this.isNotificationServiceEnabled(MainActivity.this)) {
 
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("We need permission...")
@@ -67,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton("Back", null)
                         .show();
 
+            } else {
+                // Toast to show that the app has permissions
+                Toast.makeText(MainActivity.this, "You've already given this app permissions!", Toast.LENGTH_SHORT).show();
             }
 
         });

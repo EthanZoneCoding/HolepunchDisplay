@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Switch
+    <Button
         android:id="@+id/toggle"
         android:layout_width="300dp"
         android:layout_height="67dp"
         android:checked="false"
-        android:text="Enable Display"
+        android:text="Grant Permissions"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,10 +23,11 @@
         android:layout_width="300dp"
         android:layout_height="67dp"
         android:checked="false"
-        android:text="Don't show notifications in default bar."
+        android:text="Don't show notifications in default bar. (Not reccomended)"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toggle"
-        app:layout_constraintVertical_bias="0.233" />
+        app:layout_constraintVertical_bias="0.229" />
 </androidx.constraintlayout.widget.ConstraintLayout>
