@@ -7,6 +7,8 @@ import android.view.KeyEvent;
 public class MediaManager {
     public AudioManager audioManager;
 
+    //TODO: Add support for other media keys
+
     public MediaManager(Context context) {
         this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
