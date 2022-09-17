@@ -1,7 +1,5 @@
 package com.ethanzone.hpdisplay;
 
-import static com.ethanzone.hpdisplay.HPDisplay.DEFAULT_DELAY;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
@@ -30,6 +28,10 @@ public class UIState {
 
     // Other constants
     public static Drawable ICON_BLANK = null;
+    public static Drawable ICON_NOCHANGE (Context context) {
+        return getCurrentState(context).icon;
+    }
+
 
     public static final String DEFAULT_TITLE = "Nothing to display";
     public static final String DEFAULT_DESCRIPTION = "Check back later";
@@ -77,6 +79,15 @@ public class UIState {
 
             View display = ((HPDisplay) context).display;
             View pill = ((HPDisplay) context).pill;
+
+            // Clip the title and description.
+            this.title = this.title.substring(0, Math.min(this.title.length(), 22));
+            this.description = this.description.substring(0, Math.min(this.description.length(), 200));
+
+            // Add ... if the title or description was clipped and ... is not already there
+            if (this.title.length() == 17 && !this.title.endsWith("...")) {
+                this.title += "...";
+            }
 
             ((TextView) display.findViewById(R.id.label)).setText(this.title);
             ((TextView) display.findViewById(R.id.description)).setText(this.description);

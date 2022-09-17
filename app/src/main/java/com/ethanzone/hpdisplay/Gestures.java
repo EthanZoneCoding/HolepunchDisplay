@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.Objects;
 
 public class Gestures {
 
@@ -36,6 +35,10 @@ public class Gestures {
             Log.v("event", "Click!");
             UIState uiState = UIState.getCurrentState(this.context);
             uiState.shape = UIState.SHAPE_OPEN;
+
+            // Show music if playing
+            mediaManager.updateMedia(uiState);
+
             uiState.apply(this.context);
             return true;
         });
@@ -61,26 +64,24 @@ public class Gestures {
                         Log.v("event", "icon click");
 
                         UIState uiState = UIState.getCurrentState(this.context);
-                        if (audioManager.isMusicActive() && Objects.equals(uiState.title, UIState.DEFAULT_TITLE)) {
+                        if (mediaManager.checkMedia()) {
+                            if (audioManager.isMusicActive()) {
 
-                            uiState.icon = context.getDrawable(R.drawable.playbutton);
-                            uiState.apply(this.context);
+                                uiState.icon = context.getDrawable(R.drawable.playbutton);
+                                uiState.apply(this.context);
 
-                            mediaManager.pause();
+                                mediaManager.pause();
 
-                        }
-                        // TODO: Find a condition where the music is paused, but not just not playing
-                        /*
-                        else if (Objects.equals(uiState.shape, UIState.SHAPE_OPEN)) {
+                            } else  {
 
-                            uiState.icon = context.getDrawable(R.drawable.pause);
-                            uiState.apply(this.context);
+                                uiState.icon = mediaManager.getIcon();
+                                uiState.apply(this.context);
 
-                            mediaManager.play();
+                                mediaManager.play();
 
-                        }
-                        */
-                        else {
+                            }
+
+                        } else {
 
                             try {
                                 // Open the notification

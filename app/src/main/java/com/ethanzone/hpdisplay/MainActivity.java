@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,15 +49,15 @@ public class MainActivity extends AppCompatActivity {
 
         active.setOnClickListener((compoundButton) -> {
 
-            if (!MainActivity.this.isNotificationServiceEnabled(MainActivity.this)) {
+            if (!MainActivity.this.isNotificationServiceEnabled()) {
 
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("We need permission...")
-                        .setMessage("To want permission to read notifications, so we can show them in the display. On the next screen, find this app, and allow the permission.")
+                        .setMessage("To want permission to read notifications, so we can show them on your display and control music.")
 
                         .setPositiveButton("Continue", (dialog, which) -> {
 
-                            Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+                            Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
                             startActivity(intent);
                         })
 
@@ -64,6 +65,20 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton("Back", null)
                         .show();
 
+            } else if(!MainActivity.this.isAccessibilityServiceEnabled()) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("One last step...")
+                        .setMessage("Now enable the accessibility service, so we can show them in the display. On the next screen, find this app, and allow the permission.")
+
+                        .setPositiveButton("Continue", (dialog, which) -> {
+
+                            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                            startActivity(intent);
+                        })
+
+                        // A null listener allows the button to dismiss the dialog and take no further action.
+                        .setNegativeButton("Back", null)
+                        .show();
             } else {
                 // Toast to show that the app has permissions
                 Toast.makeText(MainActivity.this, "You've already given this app permissions!", Toast.LENGTH_SHORT).show();
@@ -76,10 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Check if we have notification access
-
-    private boolean isNotificationServiceEnabled(Context c) {
-        String pkgName = c.getPackageName();
-        final String flat = Settings.Secure.getString(c.getContentResolver(),
+    private boolean isNotificationServiceEnabled() {
+        String pkgName = getPackageName();
+        final String flat = Settings.Secure.getString(getContentResolver(),
                 "enabled_notification_listeners");
         if (!TextUtils.isEmpty(flat)) {
             final String[] names = flat.split(":");
@@ -90,6 +104,15 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 }
+            }
+        }
+        return false;
+    }
+    private boolean isAccessibilityServiceEnabled() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (HPDisplay.class.getName().equals(service.service.getClassName())) {
+                return true;
             }
         }
         return false;

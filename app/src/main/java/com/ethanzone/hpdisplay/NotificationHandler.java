@@ -13,10 +13,12 @@ public class NotificationHandler {
 
     private final Utils utils;
     private final Context context;
+    public UIState backedUpState;
 
     public NotificationHandler(Context context) {
         this.context = context;
         this.utils = new Utils(context);
+        this.backedUpState = UIState.getCurrentState(context);
     }
 
     public UIState readNotification(AccessibilityEvent event) {
@@ -26,30 +28,34 @@ public class NotificationHandler {
             try {
                 // Read the notification
                 Notification notification = (Notification) event.getParcelableData();
-                String title = notification.extras.getString("android.title");
-                String description = notification.extras.getString("android.text");
+                if (!Objects.equals(notification.getChannelId(), "7")) {
+                    String title = notification.extras.getString("android.title");
+                    String description = notification.extras.getString("android.text");
 
-                // Delete the notification from the bar if the setting is enabled and the notification is not a persistent notification
-                if (this.utils.getSetting("deletefrombar") & !Objects.equals(notification.getChannelId(), "7")) {
-                    try {
-                        notification.deleteIntent.send();
-                    } catch (PendingIntent.CanceledException e) {
-                        e.printStackTrace();
+                    // Delete the notification from the bar if the setting is enabled and the notification is not a persistent notification
+                    if (this.utils.getSetting("deletefrombar")){
+                        try {
+                            notification.deleteIntent.send();
+                        } catch (PendingIntent.CanceledException e) {
+                            e.printStackTrace();
+                        }
                     }
+
+                    ((HPDisplay) this.context).clickAction = notification.contentIntent;
+
+                    // Get the icon of the notification's app
+                    Drawable icon;
+                    try {
+                        icon = this.context.getPackageManager().getApplicationIcon((String) event.getPackageName());
+                    } catch (PackageManager.NameNotFoundException e) {
+                        icon = UIState.ICON_NOCHANGE(this.context);
+                    }
+
+                    // Backup the current state
+                    this.backedUpState = UIState.getCurrentState(this.context);
+                    // Create the UIState object
+                    return new UIState(title, description, icon, icon, UIState.ICON_NOCHANGE(this.context), UIState.SHAPE_OPEN);
                 }
-
-                ((HPDisplay) this.context).clickAction = notification.contentIntent;
-
-                // Get the icon of the notification's app
-                Drawable icon;
-                try {
-                    icon = this.context.getPackageManager().getApplicationIcon((String) event.getPackageName());
-                } catch (PackageManager.NameNotFoundException e) {
-                    icon = UIState.ICON_BLANK;
-                }
-
-                // Create the UIState object
-                return new UIState(title, description, icon, icon, UIState.ICON_BLANK, UIState.SHAPE_OPEN);
             } catch (NullPointerException e) {
                 return UIState.nullState();
             }

@@ -29,7 +29,8 @@ public class HPDisplay extends AccessibilityService {
     public int closeDelay = DEFAULT_DELAY;
     private final Handler closeRunnable = new Handler();
 
-    private NotificationHandler notificationHandler = null;
+    public NotificationHandler notificationHandler = null;
+    public MediaManager mediaManager = null;
 
     public HPDisplay() {
     }
@@ -46,7 +47,6 @@ public class HPDisplay extends AccessibilityService {
     }
 
 
-
     @SuppressLint({"ClickableViewAccessibility", "InflateParams", "UseCompatLoadingForDrawables"})
     @RequiresApi(api = Build.VERSION_CODES.R)
     private void create() {
@@ -58,7 +58,6 @@ public class HPDisplay extends AccessibilityService {
         this.display = li.inflate(R.layout.popup, null);
         this.pill = li.inflate(R.layout.popup, null);
 
-        this.notificationHandler = new NotificationHandler(this);
 
         smallParams.gravity = Gravity.CENTER | Gravity.TOP;
         largeParams.gravity = Gravity.CENTER | Gravity.TOP;
@@ -79,12 +78,17 @@ public class HPDisplay extends AccessibilityService {
         gestures.setListeners();
 
         // Initialize the UI
-         UIState init = new UIState(UIState.DEFAULT_TITLE, UIState.DEFAULT_DESCRIPTION,
-                getDrawable(R.drawable.checkmark), UIState.ICON_BLANK,  UIState.ICON_BLANK, UIState.SHAPE_CLOSED);
+        UIState init = new UIState(UIState.DEFAULT_TITLE, UIState.DEFAULT_DESCRIPTION,
+                getDrawable(R.drawable.checkmark), UIState.ICON_BLANK, UIState.ICON_BLANK, UIState.SHAPE_NOCHANGE);
 
         init.apply(this);
 
+        // Initialize more components
+        this.notificationHandler = new NotificationHandler(this);
+        this.mediaManager = new MediaManager(this);
+
     }
+
     public void waitToClose() {
 
         closeDelay = DEFAULT_DELAY;
@@ -105,6 +109,8 @@ public class HPDisplay extends AccessibilityService {
 
         UIState state = notificationHandler.readNotification(event);
         state.apply(this);
+
+        this.mediaManager.updateMedia(UIState.getCurrentState(this));
 
     }
 }
