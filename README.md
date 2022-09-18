@@ -1,16 +1,15 @@
-# HolepunchDisplay
+# Hole-punch Display
 Dynamic Island style display for Android
 
 ## Current Support
 * Notifications (with icons)
-* Pausing (not playing) Media
+* Pausing and playing music
 
 ## TODO
-* Calibration
-* Everything else from Apple
+* Support for portrait mode
+* Device connection
+* Charging animation
 
 ## Current calibration
-The app is only calibrated for the Pixel 6
-
-Edit the LayoutParams in UIState.java, specifcally the y-position.
-You may need to change other things such as width and height.
+Use the in-app tools for calibration. The default values are for a Pixel 6.
+This only supports middle of the screen cameras.
