@@ -60,6 +60,7 @@ public class UIState {
         this.miniIcon = miniIcon;
         this.miniIconRight = miniIconRight;
         this.shape = shape;
+
     }
 
     public static UIState getCurrentState(Context context) {
@@ -88,7 +89,7 @@ public class UIState {
         // Apply the UIState to the UI
         if (this.shape != SHAPE_NULL) {
 
-            ICON_BLANK = context.getDrawable(R.drawable.black_circle);
+            ICON_BLANK = null;
 
             View display = ((HPDisplay) context).display;
             View pill = ((HPDisplay) context).pill;

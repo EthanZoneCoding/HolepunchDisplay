@@ -137,7 +137,7 @@ public class HPDisplay extends AccessibilityService {
         // Set a delay because the device needs a moment to update the media state
         new Handler().postDelayed(() -> {
             mediaManager.updateMedia(UIState.getCurrentState(this));
-        }, 10);
+        }, 5);
 
     }
 }

@@ -67,7 +67,7 @@ public class Gestures {
                         Log.v("event", "icon click");
 
                         UIState uiState = UIState.getCurrentState(this.context);
-                        if (mediaManager.checkMedia()) {
+                        if (mediaManager.checkMedia() && uiState.miniIcon == null) {
                             if (audioManager.isMusicActive()) {
 
                                 mediaManager.pause();

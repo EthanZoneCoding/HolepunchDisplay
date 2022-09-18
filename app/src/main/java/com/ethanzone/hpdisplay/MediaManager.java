@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
+import android.util.Log;
 import android.view.KeyEvent;
 
 public class MediaManager {
@@ -27,7 +28,7 @@ public class MediaManager {
     }
     @SuppressLint("UseCompatLoadingForDrawables")
     public void updateMedia(UIState uiState) {
-        if (checkMedia()) {
+        if (checkMedia() && uiState.miniIcon == null) {
             try {
                 uiState.title = getTitle();
                 uiState.description = getDescription();

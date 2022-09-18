@@ -44,7 +44,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/y"
-        app:layout_constraintVertical_bias="0.072" />
+        app:layout_constraintVertical_bias="0.247" />
 
     <Switch
         android:id="@+id/deletefrombar"
@@ -103,7 +103,7 @@
         android:id="@+id/y"
         android:layout_width="282dp"
         android:layout_height="23dp"
-        android:layout_marginBottom="284dp"
+        android:layout_marginBottom="260dp"
         android:max="300"
         android:min="-300"
         android:progressTint="#8E6FC5"
@@ -111,9 +111,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/x"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/imageView"
