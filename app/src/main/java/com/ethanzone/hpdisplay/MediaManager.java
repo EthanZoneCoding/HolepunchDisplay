@@ -36,15 +36,14 @@ public class MediaManager {
                 } else {
                     uiState.icon = this.context.getDrawable(R.drawable.playbutton);
                 }
-                uiState.miniIconRight = uiState.icon = getIcon();
+                uiState.miniIconRight = getIcon();
             } catch (NullPointerException e) {
+                e.printStackTrace();
                 uiState = ((HPDisplay) this.context).notificationHandler.backedUpState;
             }
-        } else {
-            uiState = ((HPDisplay) this.context).notificationHandler.backedUpState;
+            uiState.shape = UIState.SHAPE_NOCHANGE;
+            uiState.apply(this.context);
         }
-        uiState.shape = UIState.SHAPE_NOCHANGE;
-        uiState.apply(this.context);
     }
 
     public boolean checkMedia() {

@@ -2,30 +2,26 @@ package com.ethanzone.hpdisplay;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.view.View;
+import android.view.MotionEvent;
 import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
+    @SuppressLint({"UseSwitchCompatOrMaterialCode", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +32,51 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
 
 
-        // Update switches
-        Button active = findViewById(R.id.toggle);;
+        // Update setting switches and bars
+        Button active = findViewById(R.id.grant);;
         Switch deletefrombar = findViewById(R.id.deletefrombar);
+        ProgressBar x = findViewById(R.id.x);
+        ProgressBar y = findViewById(R.id.y);
+
         deletefrombar.setChecked(prefs.getBoolean("deletefrombar", false));
+        x.setProgress(prefs.getInt("x", UIState.smallParams.x));
+        y.setProgress(prefs.getInt("y", UIState.smallParams.y));
+
 
         // Set listeners
+        findViewById(R.id.donate).setOnClickListener(view -> {
+            // Open a url
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/ethanporcaro"));
+            startActivity(browserIntent);
+        });
+
+        findViewById(R.id.reset).setOnClickListener(view -> {
+            // Reset settings
+            editor.clear();
+            editor.apply();
+
+            // Reset UI
+            deletefrombar.setChecked(false);
+            x.setProgress(UIState.smallParams.x);
+            y.setProgress(UIState.smallParams.y);
+        });
+
+        x.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("x", x.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
+        y.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("y", y.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
         deletefrombar.setOnCheckedChangeListener((buttonView, isChecked) -> {
             editor.putBoolean("deletefrombar", isChecked);
             editor.apply();

@@ -2,4 +2,10 @@
     <string name="app_name">Hole-punch Display</string>
     <string name="accessibility_service_description">Creates the hole-puch display.</string>
     <string name="accessibility_service_label">Hole-punch Display</string>
+    <string name="don_t_show_notifications_in_default_bar_not_reccomended">Don\'t show notifications in default bar. (Not reccomended)</string>
+    <string name="grant_permissions">Grant Permissions</string>
+    <string name="x_offset">X Offset</string>
+    <string name="y_offset">Y Offset</string>
+    <string name="reset">Reset</string>
+    <string name="donate">Donate</string>
 </resources>

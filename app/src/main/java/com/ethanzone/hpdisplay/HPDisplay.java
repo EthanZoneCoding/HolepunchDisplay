@@ -30,7 +30,9 @@ public class HPDisplay extends AccessibilityService {
     private final Handler closeRunnable = new Handler();
 
     public NotificationHandler notificationHandler = null;
+    public WindowManager windowManager;
     public MediaManager mediaManager = null;
+    public Utils utils = null;
 
     public HPDisplay() {
     }
@@ -52,7 +54,7 @@ public class HPDisplay extends AccessibilityService {
     private void create() {
 
         // Create the overlay window and add the view
-        WindowManager windowManager = (WindowManager) this.getSystemService(Service.WINDOW_SERVICE);
+        windowManager = (WindowManager) this.getSystemService(Service.WINDOW_SERVICE);
 
         LayoutInflater li = LayoutInflater.from(this);
         this.display = li.inflate(R.layout.popup, null);
@@ -86,6 +88,7 @@ public class HPDisplay extends AccessibilityService {
         // Initialize more components
         this.notificationHandler = new NotificationHandler(this);
         this.mediaManager = new MediaManager(this);
+        this.utils = new Utils(this);
 
     }
 
@@ -102,15 +105,39 @@ public class HPDisplay extends AccessibilityService {
 
     }
 
+    @SuppressLint("RtlHardcoded")
+    public void updatePostion() {
+        int x = utils.getSettingInt("x");
+        int y = utils.getSettingInt("y");
+
+        WindowManager.LayoutParams params1 = smallParams;
+        WindowManager.LayoutParams params2 = largeParams;
+        params1.x = x;
+        params1.y = y;
+        params2.x = x;
+        params2.y = y - 175;
+
+        params1.gravity = Gravity.CENTER | Gravity.TOP;
+        params2.gravity = Gravity.CENTER | Gravity.TOP;
+
+        windowManager.updateViewLayout(pill, params1);
+        windowManager.updateViewLayout(display, params2);
+
+    }
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
         Log.v("event", event.toString());
 
-        UIState state = notificationHandler.readNotification(event);
-        state.apply(this);
+        notificationHandler.readNotification(event).apply(this);
 
-        this.mediaManager.updateMedia(UIState.getCurrentState(this));
+        updatePostion();
+
+        // Set a delay because the device needs a moment to update the media state
+        new Handler().postDelayed(() -> {
+            mediaManager.updateMedia(UIState.getCurrentState(this));
+        }, 10);
 
     }
 }

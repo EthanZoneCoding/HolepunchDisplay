@@ -16,4 +16,9 @@ public class Utils {
         SharedPreferences prefs = context.getSharedPreferences("com.ethanzone.hpdisplay", Context.MODE_PRIVATE);
         return prefs.getBoolean(setting, false);
     }
+    public int getSettingInt(String setting) {
+        // Get preferences
+        SharedPreferences prefs = context.getSharedPreferences("com.ethanzone.hpdisplay", Context.MODE_PRIVATE);
+        return prefs.getInt(setting, 0);
+    }
 }

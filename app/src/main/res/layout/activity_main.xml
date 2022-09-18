@@ -7,27 +7,123 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/toggle"
-        android:layout_width="300dp"
-        android:layout_height="67dp"
+        android:id="@+id/grant"
+        android:layout_width="220dp"
+        android:layout_height="54dp"
         android:checked="false"
-        android:text="Grant Permissions"
+        android:text="@string/grant_permissions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.339" />
+
+    <Button
+        android:id="@+id/donate"
+        android:layout_width="258dp"
+        android:layout_height="51dp"
+        android:backgroundTint="#4CAF50"
+        android:checked="false"
+        android:text="@string/donate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reset"
+        app:layout_constraintVertical_bias="0.74" />
+
+    <Button
+        android:id="@+id/reset"
+        android:layout_width="89dp"
+        android:layout_height="58dp"
+        android:backgroundTint="#F44336"
+        android:checked="false"
+        android:text="@string/reset"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.059" />
+        app:layout_constraintTop_toBottomOf="@+id/y"
+        app:layout_constraintVertical_bias="0.072" />
 
     <Switch
         android:id="@+id/deletefrombar"
         android:layout_width="300dp"
         android:layout_height="67dp"
         android:checked="false"
-        android:text="Don't show notifications in default bar. (Not reccomended)"
+        android:text="@string/don_t_show_notifications_in_default_bar_not_reccomended"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toggle"
-        app:layout_constraintVertical_bias="0.229" />
+        app:layout_constraintTop_toBottomOf="@+id/grant"
+        app:layout_constraintVertical_bias="0.08" />
+
+    <SeekBar
+        android:id="@+id/x"
+        android:layout_width="282dp"
+        android:layout_height="23dp"
+        android:layout_marginTop="52dp"
+        android:max="300"
+        android:min="-300"
+        android:progressTint="#8E6FC5"
+        android:thumbTint="#673AB7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/deletefrombar"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/x_offset"
+        app:layout_constraintBottom_toTopOf="@+id/x"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/deletefrombar"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/y_offset"
+        app:layout_constraintBottom_toTopOf="@+id/y"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/x"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <SeekBar
+        android:id="@+id/y"
+        android:layout_width="282dp"
+        android:layout_height="23dp"
+        android:layout_marginBottom="284dp"
+        android:max="300"
+        android:min="-300"
+        android:progressTint="#8E6FC5"
+        android:thumbTint="#673AB7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/x"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/grant"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.311"
+        app:srcCompat="@drawable/ic_hpdisplay" />
 </androidx.constraintlayout.widget.ConstraintLayout>

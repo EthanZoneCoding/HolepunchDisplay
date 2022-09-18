@@ -28,7 +28,20 @@ public class UIState {
 
     // Other constants
     public static Drawable ICON_BLANK = null;
-    public static Drawable ICON_NOCHANGE (Context context) {
+    public static final int ID_BIG = 0;
+    public static final int ID_SMALL_L = 1;
+    public static final int ID_SMALL_R = 2;
+
+    public static Drawable ICON_NOCHANGE (Context context, int icon_id) {
+        switch (icon_id) {
+            case ID_BIG:
+                return getCurrentState(context).icon;
+            case ID_SMALL_L:
+                return getCurrentState(context).miniIcon;
+            case ID_SMALL_R:
+                return getCurrentState(context).miniIconRight;
+        }
+
         return getCurrentState(context).icon;
     }
 

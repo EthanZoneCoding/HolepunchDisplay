@@ -48,13 +48,13 @@ public class NotificationHandler {
                     try {
                         icon = this.context.getPackageManager().getApplicationIcon((String) event.getPackageName());
                     } catch (PackageManager.NameNotFoundException e) {
-                        icon = UIState.ICON_NOCHANGE(this.context);
+                        icon = UIState.ICON_NOCHANGE(this.context, UIState.ID_BIG);
                     }
 
                     // Backup the current state
                     this.backedUpState = UIState.getCurrentState(this.context);
                     // Create the UIState object
-                    return new UIState(title, description, icon, icon, UIState.ICON_NOCHANGE(this.context), UIState.SHAPE_OPEN);
+                    return new UIState(title, description, icon, icon, UIState.ICON_NOCHANGE(this.context, UIState.ID_SMALL_R), UIState.SHAPE_OPEN);
                 }
             } catch (NullPointerException e) {
                 return UIState.nullState();
