@@ -36,11 +36,14 @@ public class MainActivity extends AppCompatActivity {
         Button active = findViewById(R.id.grant);;
         Switch deletefrombar = findViewById(R.id.deletefrombar);
         ProgressBar x = findViewById(R.id.x);
+        ProgressBar x2 = findViewById(R.id.x2);
         ProgressBar y = findViewById(R.id.y);
+        ProgressBar y2 = findViewById(R.id.y2);
+        ProgressBar width = findViewById(R.id.width);
+        ProgressBar width2 = findViewById(R.id.width2);
+        ProgressBar c = findViewById(R.id.heightclosed);
+        ProgressBar o = findViewById(R.id.heightopen);
 
-        deletefrombar.setChecked(prefs.getBoolean("deletefrombar", false));
-        x.setProgress(prefs.getInt("x", UIState.smallParams.x));
-        y.setProgress(prefs.getInt("y", UIState.smallParams.y));
 
 
         // Set listeners
@@ -51,19 +54,42 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.reset).setOnClickListener(view -> {
-            // Reset settings
-            editor.clear();
-            editor.apply();
-
             // Reset UI
             deletefrombar.setChecked(false);
-            x.setProgress(UIState.smallParams.x);
-            y.setProgress(UIState.smallParams.y);
+            x.setProgress(0);
+            x2.setProgress(0);
+            y.setProgress(5);
+            y2.setProgress(-220);
+            width.setProgress(319);
+            width2.setProgress(1014);
+            c.setProgress(113);
+            o.setProgress(563);
+
+            // Reset preferences
+            editor.putBoolean("deletefrombar", false);
+            editor.putInt("x", 0);
+            editor.putInt("x2", 0);
+            editor.putInt("y", 5);
+            editor.putInt("y2", -220);
+            editor.putInt("width", 319);
+            editor.putInt("width2", 1014);
+            editor.putInt("heightclosed", 113);
+            editor.putInt("heightopen", 563);
+            editor.apply();
+
         });
 
         x.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                 editor.putInt("x", x.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
+        x2.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("x2", x2.getProgress());
                 editor.apply();
             }
             return false;
@@ -77,10 +103,53 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+        y2.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("y2", y2.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
+        width.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("width", width.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
+        width2.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("width2", width2.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
+        c.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("heightclosed", c.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
+        o.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                editor.putInt("heightopen", o.getProgress());
+                editor.apply();
+            }
+            return false;
+        });
+
         deletefrombar.setOnCheckedChangeListener((buttonView, isChecked) -> {
             editor.putBoolean("deletefrombar", isChecked);
             editor.apply();
         });
+
+        ((Button) findViewById(R.id.reset)).setPressed(true);
+        ((Button) findViewById(R.id.reset)).setPressed(false);
 
         active.setOnClickListener((compoundButton) -> {
 

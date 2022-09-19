@@ -61,8 +61,8 @@ public class HPDisplay extends AccessibilityService {
         this.pill = li.inflate(R.layout.popup, null);
 
 
-        smallParams.gravity = Gravity.CENTER | Gravity.TOP;
-        largeParams.gravity = Gravity.CENTER | Gravity.TOP;
+        smallParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+        largeParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
         windowManager.addView(this.pill, smallParams);
         windowManager.addView(this.display, largeParams);
 
@@ -109,16 +109,29 @@ public class HPDisplay extends AccessibilityService {
     public void updatePostion() {
         int x = utils.getSettingInt("x");
         int y = utils.getSettingInt("y");
+        int y2 = utils.getSettingInt("y2");
+        int c = utils.getSettingInt("heightclosed");
+        int o = utils.getSettingInt("heightopen");
+        int w = utils.getSettingInt("width");
+        int w2 = utils.getSettingInt("width2");
+
+        Log.d("HPDisplay", "x: " + x + " y: " + y + " y2: " + y2 + " c: " + c + " o: " + o + " w: " + w + " w2: " + w2);
 
         WindowManager.LayoutParams params1 = smallParams;
         WindowManager.LayoutParams params2 = largeParams;
+
         params1.x = x;
         params1.y = y;
-        params2.x = x;
-        params2.y = y - 175;
+        params1.width = w;
+        params1.height = c;
 
-        params1.gravity = Gravity.CENTER | Gravity.TOP;
-        params2.gravity = Gravity.CENTER | Gravity.TOP;
+        params2.x = x;
+        params2.y = y2;
+        params2.width = w2;
+        params2.height = o;
+
+        params1.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+        params2.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
 
         windowManager.updateViewLayout(pill, params1);
         windowManager.updateViewLayout(display, params2);
@@ -130,14 +143,18 @@ public class HPDisplay extends AccessibilityService {
 
         Log.v("event", event.toString());
 
-        notificationHandler.readNotification(event).apply(this);
+        try {
+            notificationHandler.readNotification(event).apply(this);
 
-        updatePostion();
+            updatePostion();
 
-        // Set a delay because the device needs a moment to update the media state
-        new Handler().postDelayed(() -> {
-            mediaManager.updateMedia(UIState.getCurrentState(this));
-        }, 5);
+            // Set a delay because the device needs a moment to update the media state
+            new Handler().postDelayed(() -> {
+                mediaManager.updateMedia(UIState.getCurrentState(this));
+            }, 5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }

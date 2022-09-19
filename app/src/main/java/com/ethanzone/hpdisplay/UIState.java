@@ -96,11 +96,14 @@ public class UIState {
 
             // Clip the title and description.
             this.title = this.title.substring(0, Math.min(this.title.length(), 22));
-            this.description = this.description.substring(0, Math.min(this.description.length(), 200));
+            this.description = this.description.substring(0, Math.min(this.description.length(), 150));
 
             // Add ... if the title or description was clipped and ... is not already there
-            if (this.title.length() == 17 && !this.title.endsWith("...")) {
+            if (this.title.length() == 22 && !this.title.endsWith("...")) {
                 this.title += "...";
+            }
+            if (this.description.length() == 150 && !this.description.endsWith("...")) {
+                this.description += "...";
             }
 
             ((TextView) display.findViewById(R.id.label)).setText(this.title);
@@ -116,7 +119,7 @@ public class UIState {
                     contract(display, pill);
                     break;
                 case SHAPE_OPEN:
-                    expand(display);
+                    expand(display, pill);
                     break;
                 case SHAPE_NOCHANGE:
                     break;
@@ -154,7 +157,7 @@ public class UIState {
 
     private boolean expanding;
 
-    private void expand(View display) {
+    private void expand(View display, View pill) {
         if (!this.expanding) {
             this.expanding = true;
 
@@ -163,6 +166,7 @@ public class UIState {
 
             // Show the display
             display.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(() -> pill.setVisibility(View.GONE), 5);
 
             // Animate the window
 
@@ -184,6 +188,7 @@ public class UIState {
                     .scaleX(3)
                     .scaleY(3)
                     .translationY(100)
+                    .translationX(new Utils(display.getContext()).getSettingInt("x2"))
                     .setInterpolator(new AccelerateDecelerateInterpolator())
                     .setDuration(800);
 
@@ -221,6 +226,7 @@ public class UIState {
             display.animate()
                     .scaleX(1f)
                     .scaleY(1f)
+                    .translationX(0)
                     .translationY(0)
                     .setInterpolator(new AccelerateDecelerateInterpolator())
                     .setDuration(800);
@@ -233,7 +239,8 @@ public class UIState {
                 pill.findViewById(R.id.button).setElevation(-10);
 
                 // Hide the Display
-                display.setVisibility(View.GONE);
+                pill.setVisibility(View.VISIBLE);
+                new Handler().postDelayed(() -> display.setVisibility(View.GONE), 5);
 
                 this.contracting = false;
 

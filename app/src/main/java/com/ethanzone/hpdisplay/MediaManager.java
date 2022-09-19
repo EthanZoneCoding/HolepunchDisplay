@@ -70,7 +70,15 @@ public class MediaManager {
     public String getDescription() {
         String album = this.mediaController.getMetadata().getString(MediaMetadata.METADATA_KEY_ALBUM);
         String artist = this.mediaController.getMetadata().getString(MediaMetadata.METADATA_KEY_ARTIST);
-        return artist + " - " + album;
+        if (album != null && artist != null) {
+            return album + " - " + artist;
+        } else if (album != null) {
+            return album;
+        } else if (artist != null) {
+            return artist;
+        } else {
+            return "";
+        }
     }
 
     public void pause() {
