@@ -36,12 +36,12 @@ public class Gestures {
         this.pill.findViewById(R.id.button).setOnTouchListener((view, motionEvent) -> {
             Log.v("event", "Click!");
 
-            UIState uiState = UIState.getCurrentState(this.context);
+            UIState uiState = ((HPDisplay) this.context).uiState;
             uiState.shape = UIState.SHAPE_OPEN;
-            uiState.apply(this.context);
+            uiState.apply();
 
             // Show music if playing
-            mediaManager.updateMedia(uiState);
+            mediaManager.updateMedia();
 
             return true;
         });
@@ -66,18 +66,18 @@ public class Gestures {
                     if (distance < 200f) {
                         Log.v("event", "icon click");
 
-                        UIState uiState = UIState.getCurrentState(this.context);
-                        if (mediaManager.checkMedia() && uiState.miniIcon == null) {
+                        UIState uiState = ((HPDisplay) this.context).uiState;
+                        if (mediaManager.checkMedia() && ((HPDisplay) this.context).notificationHandler.backedUpState == null) {
                             if (audioManager.isMusicActive()) {
 
                                 mediaManager.pause();
                                 uiState.icon = this.context.getDrawable(R.drawable.playbutton);
-                                uiState.apply(this.context);
+                                uiState.apply();
 
                             } else {
 
                                 mediaManager.play();
-                                mediaManager.updateMedia(uiState);
+                                mediaManager.updateMedia();
 
                             }
 
@@ -88,17 +88,21 @@ public class Gestures {
                                 ((HPDisplay) this.context).clickAction.send();
                                 // Close the display
                                 uiState.shape = UIState.SHAPE_CLOSED;
-                                uiState.apply(this.context);
+                                uiState.apply();
 
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
                             // Clear the display
-                            new UIState(UIState.DEFAULT_TITLE, UIState.DEFAULT_DESCRIPTION,
-                                    context.getDrawable(R.drawable.checkmark),
-                                    UIState.ICON_BLANK, UIState.ICON_BLANK, UIState.SHAPE_NOCHANGE)
-                                    .apply(this.context);
+                            ((HPDisplay) context).uiState.title = UIState.DEFAULT_TITLE;
+                            ((HPDisplay) context).uiState.description = UIState.DEFAULT_DESCRIPTION;
+                            ((HPDisplay) context).uiState.icon = context.getDrawable(R.drawable.checkmark);
+                            ((HPDisplay) context).uiState.miniIcon = UIState.ICON_BLANK;
+                            ((HPDisplay) context).uiState.miniIconRight = UIState.ICON_BLANK;
+                            ((HPDisplay) context).uiState.shape = UIState.SHAPE_NOCHANGE;
+                            ((HPDisplay) context).uiState.apply();
+                            ((HPDisplay) this.context).notificationHandler.backedUpState = null;
 
                         }
 
@@ -114,9 +118,9 @@ public class Gestures {
                     if (dy < -10) {
                         Log.v("event", "swipe up");
 
-                        UIState uiState = UIState.getCurrentState(this.context);
+                        UIState uiState = ((HPDisplay) this.context).uiState;
                         uiState.shape = UIState.SHAPE_CLOSED;
-                        uiState.apply(this.context);
+                        uiState.apply();
 
                         return true;
                     }

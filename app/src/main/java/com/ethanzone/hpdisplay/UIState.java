@@ -11,6 +11,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
+import java.util.Objects;
+
 public class UIState {
 
     public String title;
@@ -20,8 +22,9 @@ public class UIState {
     public Drawable miniIconRight;
     public int shape;
 
+    public Context context;
+
     // Define the shape constants
-    public static final int SHAPE_NULL = -1;
     public static final int SHAPE_NOCHANGE = 0;
     public static final int SHAPE_CLOSED = 1;
     public static final int SHAPE_OPEN = 2;
@@ -32,99 +35,71 @@ public class UIState {
     public static final int ID_SMALL_L = 1;
     public static final int ID_SMALL_R = 2;
 
-    public static Drawable ICON_NOCHANGE (Context context, int icon_id) {
+    public Drawable ICON_NOCHANGE(int icon_id) {
         switch (icon_id) {
             case ID_BIG:
-                return getCurrentState(context).icon;
+                return ((HPDisplay) this.context).uiState.icon;
             case ID_SMALL_L:
-                return getCurrentState(context).miniIcon;
+                return ((HPDisplay) this.context).uiState.miniIcon;
             case ID_SMALL_R:
-                return getCurrentState(context).miniIconRight;
+                return ((HPDisplay) this.context).uiState.miniIconRight;
         }
-
-        return getCurrentState(context).icon;
+        return null;
     }
 
 
     public static final String DEFAULT_TITLE = "Nothing to display";
     public static final String DEFAULT_DESCRIPTION = "Check back later";
 
-    public static UIState nullState() {
-        return new UIState("", "",  null, null, null,  SHAPE_NULL);
-    }
-
-    public UIState(String title, String description, Drawable icon, Drawable miniIcon, Drawable miniIconRight, int shape) {
+    public UIState(Context context, String title, String description, Drawable icon, Drawable miniIcon, Drawable miniIconRight, int shape) {
         this.title = title;
         this.description = description;
         this.icon = icon;
         this.miniIcon = miniIcon;
         this.miniIconRight = miniIconRight;
         this.shape = shape;
+        this.context = context;
 
-    }
-
-    public static UIState getCurrentState(Context context) {
-        View display = ((HPDisplay) context).display;
-        View pill = ((HPDisplay) context).pill;
-
-        String title = ((TextView) display.findViewById(R.id.label)).getText().toString();
-        String description = ((TextView) display.findViewById(R.id.description)).getText().toString();
-        Drawable icon = display.findViewById(R.id.icon).getBackground();
-        Drawable miniIcon = pill.findViewById(R.id.icon).getBackground();
-        Drawable miniIconRight = pill.findViewById(R.id.icon2).getBackground();
-
-        int shape;
-        if (display.getVisibility() == View.VISIBLE){
-            shape = SHAPE_OPEN;
-        } else {
-            shape = SHAPE_CLOSED;
-        }
-
-        return new UIState(title, description,  icon, miniIcon, miniIconRight, shape);
     }
 
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    public void apply(Context context) {
-        // Apply the UIState to the UI
-        if (this.shape != SHAPE_NULL) {
+    public void apply() {
 
-            ICON_BLANK = null;
+        View display = ((HPDisplay) context).display;
+        View pill = ((HPDisplay) context).pill;
 
-            View display = ((HPDisplay) context).display;
-            View pill = ((HPDisplay) context).pill;
+        // Clip the title and description.
+        this.title = this.title.substring(0, Math.min(this.title.length(), 22));
+        this.description = this.description.substring(0, Math.min(this.description.length(), 150));
 
-            // Clip the title and description.
-            this.title = this.title.substring(0, Math.min(this.title.length(), 22));
-            this.description = this.description.substring(0, Math.min(this.description.length(), 150));
-
-            // Add ... if the title or description was clipped and ... is not already there
-            if (this.title.length() == 22 && !this.title.endsWith("...")) {
-                this.title += "...";
-            }
-            if (this.description.length() == 150 && !this.description.endsWith("...")) {
-                this.description += "...";
-            }
-
-            ((TextView) display.findViewById(R.id.label)).setText(this.title);
-            ((TextView) display.findViewById(R.id.description)).setText(this.description);
-            display.findViewById(R.id.icon).setBackground(this.icon);
-            pill.findViewById(R.id.icon).setBackground(this.miniIcon);
-            pill.findViewById(R.id.icon2).setBackground(this.miniIconRight);
-
-            // Size the display
-
-            switch (this.shape) {
-                case SHAPE_CLOSED:
-                    contract(display, pill);
-                    break;
-                case SHAPE_OPEN:
-                    expand(display, pill);
-                    break;
-                case SHAPE_NOCHANGE:
-                    break;
-            }
+        // Add ... if the title or description was clipped and ... is not already there
+        if (this.title.length() == 22 && !this.title.endsWith("...")) {
+            this.title += "...";
         }
+        if (this.description.length() == 150 && !this.description.endsWith("...")) {
+            this.description += "...";
+        }
+
+        ((TextView) display.findViewById(R.id.label)).setText(this.title);
+        ((TextView) display.findViewById(R.id.description)).setText(this.description);
+        display.findViewById(R.id.icon).setBackground(this.icon);
+        pill.findViewById(R.id.icon).setBackground(this.miniIcon);
+        pill.findViewById(R.id.icon2).setBackground(this.miniIconRight);
+
+        // Size the display
+
+        switch (this.shape) {
+            case SHAPE_CLOSED:
+                contract(display, pill);
+                break;
+            case SHAPE_OPEN:
+                expand(display, pill);
+                break;
+            case SHAPE_NOCHANGE:
+                break;
+        }
+
     }
 
     public final static WindowManager.LayoutParams smallParams = new WindowManager.LayoutParams(
@@ -201,6 +176,7 @@ public class UIState {
 
     private boolean contracting;
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private void contract(View display, View pill) {
 
         if (!this.contracting) {

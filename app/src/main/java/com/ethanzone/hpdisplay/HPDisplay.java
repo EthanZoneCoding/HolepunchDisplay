@@ -7,7 +7,6 @@ import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
@@ -18,6 +17,8 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 
 import androidx.annotation.RequiresApi;
+
+import java.util.Objects;
 
 
 public class HPDisplay extends AccessibilityService {
@@ -34,6 +35,7 @@ public class HPDisplay extends AccessibilityService {
     public WindowManager windowManager;
     public MediaManager mediaManager = null;
     public Utils utils = null;
+    public UIState uiState = null;
 
     public HPDisplay() {
     }
@@ -78,13 +80,13 @@ public class HPDisplay extends AccessibilityService {
         MediaManager mediaManager = new MediaManager(this);
         Gestures gestures = new Gestures(this, this.display, this.pill, mediaManager);
 
-        gestures.setListeners();
-
         // Initialize the UI
-        UIState init = new UIState(UIState.DEFAULT_TITLE, UIState.DEFAULT_DESCRIPTION,
+        uiState = new UIState(this, UIState.DEFAULT_TITLE, UIState.DEFAULT_DESCRIPTION,
                 getDrawable(R.drawable.checkmark), UIState.ICON_BLANK, UIState.ICON_BLANK, UIState.SHAPE_NOCHANGE);
 
-        init.apply(this);
+        uiState.apply();
+
+        gestures.setListeners();
 
         // Initialize more components
         this.notificationHandler = new NotificationHandler(this);
@@ -99,9 +101,9 @@ public class HPDisplay extends AccessibilityService {
 
         closeRunnable.removeCallbacksAndMessages(null);
         closeRunnable.postDelayed(() -> {
-            UIState uiState = UIState.getCurrentState(this);
+            UIState uiState = this.uiState;
             uiState.shape = UIState.SHAPE_CLOSED;
-            uiState.apply(this);
+            uiState.apply();
         }, closeDelay);
 
     }
@@ -145,18 +147,26 @@ public class HPDisplay extends AccessibilityService {
         Log.v("event", event.toString());
 
         try {
-            notificationHandler.readNotification(event).apply(this);
-
-            updatePostion();
-
-            // Set a delay because the device needs a moment to update the media state
-            new Handler().postDelayed(() -> {
-                mediaManager.updateMedia(UIState.getCurrentState(this));
-            }, 5);
+            notificationHandler.readNotification(event);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        try {
+            updatePostion();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            // Set a delay because the device needs a moment to update the media state
+            new Handler().postDelayed(() -> mediaManager.updateMedia(), 5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // TODO: Make this work
+        /*
         // Get the window orientation
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -166,12 +176,13 @@ public class HPDisplay extends AccessibilityService {
         } else {
             // In portrait
             pill.setVisibility(View.VISIBLE);
-            if (UIState.getCurrentState(this).shape == UIState.SHAPE_OPEN) {
+            if (uiState.shape == UIState.SHAPE_OPEN) {
                 display.setVisibility(View.VISIBLE);
             } else {
                 display.setVisibility(View.GONE);
             }
         }
+        */
 
     }
 }

@@ -9,7 +9,6 @@ import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
-import android.util.Log;
 import android.view.KeyEvent;
 
 public class MediaManager {
@@ -27,8 +26,9 @@ public class MediaManager {
         this.context = context;
     }
     @SuppressLint("UseCompatLoadingForDrawables")
-    public void updateMedia(UIState uiState) {
-        if (checkMedia() && uiState.miniIcon == null) {
+    public void updateMedia() {
+        UIState uiState = ((HPDisplay) this.context).uiState;
+        if (checkMedia() && ((HPDisplay) this.context).notificationHandler.backedUpState == null) {
             try {
                 uiState.title = getTitle();
                 uiState.description = getDescription();
@@ -43,7 +43,11 @@ public class MediaManager {
                 uiState = ((HPDisplay) this.context).notificationHandler.backedUpState;
             }
             uiState.shape = UIState.SHAPE_NOCHANGE;
-            uiState.apply(this.context);
+            try {
+                uiState.apply();
+            } catch (NullPointerException e) {
+                // Music was closed
+            }
         }
     }
 
