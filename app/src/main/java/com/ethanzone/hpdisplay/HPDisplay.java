@@ -7,6 +7,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
@@ -154,6 +155,22 @@ public class HPDisplay extends AccessibilityService {
             }, 5);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // Get the window orientation
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
+            pill.setVisibility(View.GONE);
+            display.setVisibility(View.GONE);
+        } else {
+            // In portrait
+            pill.setVisibility(View.VISIBLE);
+            if (UIState.getCurrentState(this).shape == UIState.SHAPE_OPEN) {
+                display.setVisibility(View.VISIBLE);
+            } else {
+                display.setVisibility(View.GONE);
+            }
         }
 
     }
