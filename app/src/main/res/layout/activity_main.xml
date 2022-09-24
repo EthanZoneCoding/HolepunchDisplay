@@ -52,7 +52,7 @@
         android:layout_width="300dp"
         android:layout_height="67dp"
         android:checked="false"
-        android:text="@string/don_t_show_notifications_in_default_bar_not_reccomended"
+        android:text="@string/don_t_show_notifications_in_default_bar_not_recommended"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
